@@ -38,7 +38,8 @@ public class PushServer {
 	public enum MsgType{BroadcastMessage,BroadcastNotice,TagMessage,TagNotice,SingleMessage,SingleNotice}
 	//enum DeviceType{Android,iOS};
 	public enum DeployStatus {Developer,Production};
-	
+
+//初始化Key参数,其中apiKey, secretKey是在推送开发者网站中创建新应用时获取到的。
 	public void setKey(String _apiKey,String _secretKey){
 		setApiKey(_apiKey);
 		setSecretKey(_secretKey);
@@ -60,6 +61,25 @@ public class PushServer {
 		PushServer.secretKey = secretKey;
 	}
 	
+//Android平台接口--------------------------------------------------------
+
+//推送广播消息
+/*
+**输入：**
+
+MsgType type ：指定推送消息类型，枚举类型
+> 消息：MsgType.BroadcastMessage
+> 
+> 通知：MsgType.BroadcastNotice 
+
+String msg ：推送内容，字符串类型
+
+String title ：推送标题（可选参数），字符串类型，只在发送`通知`时需指定
+
+**输出：**
+
+boolean 布尔类型，推送成功返回true，失败返回false
+*/	
 	public boolean PushBroadcastMsg(MsgType type ,String msg,String...title){
 		
 		if(MsgType.BroadcastMessage!=type && MsgType.BroadcastNotice!=type){
@@ -126,6 +146,26 @@ public class PushServer {
 		
 	}
 	
+	
+//推送标签消息
+/*
+**输入：**
+
+MsgType type： 指定推送消息类型，枚举类型
+> 消息：MsgType.TagMessage
+> 
+> 通知：MsgType.TagNotice 
+
+String msg ：推送内容，字符串类型
+
+String tag ：标签消息，字符串类型，可用于分组
+
+String title： 推送标题（可选参数），字符串类型，只在发送`通知`时需指定
+
+**输出：**
+
+boolean 布尔类型，推送成功返回true，失败返回false
+*/	
 	public boolean PushTagMsg(MsgType type ,String tag,String msg,String...title){
 		
 		if(MsgType.TagMessage!=type && MsgType.TagNotice!=type){
@@ -184,7 +224,28 @@ public class PushServer {
 				
 		return true;		
 	}
-	
+
+//推送某个特定用户消息
+/*
+**输入：**
+
+MsgType type： 指定推送消息类型，枚举类型
+> 消息：MsgType.SingleMessage
+> 
+> 通知：MsgType.SingleNotice 
+
+Long ChannelId： 推送通道ID
+
+String UserId：应用的用户ID
+
+String msg： 推送内容，字符串类型
+
+String title ：推送标题（可选参数），字符串类型，只在发送`通知`时需指定
+
+**输出：**
+
+boolean 布尔类型，推送成功返回true，失败返回false
+*/	
 	public boolean PushSingleMsg(MsgType type,Long ChannelId,String UserId,String msg,String...title){
 		
 		if(MsgType.SingleMessage!=type && MsgType.SingleNotice!=type){
@@ -245,6 +306,17 @@ public class PushServer {
 		
 	}
 
+
+//查询应用绑定设备信息
+/*
+**输入：**
+
+String UserId：应用的用户ID
+
+**输出：**
+
+String 查询结果，JSON格式数据，包含绑定设备的信息。
+*/
 	public String QueryBindList(String UserId){
 		String bindlist="";
 		ChannelKeyPair pair = new ChannelKeyPair(getApiKey(), getSecretKey());		
@@ -309,7 +381,28 @@ public class PushServer {
 		return bindlist;
 		
 	}
-	
+
+
+//iOS平台接口------------------------------------
+//>注：iOS平台只能推送`通知`消息
+
+//推送广播消息
+/*
+**输入：**
+
+DeployStatus status ：枚举类型,指定推送开发模式状态，不同状态需要终端采用不同的开发者证书
+> 开发状态：DeployStatus.Developer
+> 
+> 发布状态：DeployStatus.Production 
+
+String msg ：推送内容，字符串类型
+
+String title ：推送标题（可选参数），字符串类型
+
+**输出：**
+
+boolean 布尔类型，推送成功返回true，失败返回false
+*/	
 	public boolean iOSPushBroadcastMsg(DeployStatus status,String msg,String...title){
 		ChannelKeyPair pair = new ChannelKeyPair(getApiKey(), getSecretKey());
 		// 2. 创建BaiduChannelClient对象实例
@@ -357,7 +450,26 @@ public class PushServer {
 		return true;
 		
 	}
-	
+
+//推送标签消息
+/*
+**输入：**
+
+DeployStatus status ：枚举类型,指定推送开发模式状态，不同状态需要终端采用不同的开发者证书
+> 开发状态：DeployStatus.Developer
+> 
+> 发布状态：DeployStatus.Production 
+
+String msg ：推送内容，字符串类型
+
+String tag ：标签消息，字符串类型，可用于分组
+
+String title ：推送标题（可选参数），字符串类型
+
+**输出：**
+
+boolean 布尔类型，推送成功返回true，失败返回false
+*/
 	public boolean iOSPushTagMsg(DeployStatus status ,String tag,String msg,String...title){
 		ChannelKeyPair pair = new ChannelKeyPair(getApiKey(), getSecretKey());
 		// 2. 创建BaiduChannelClient对象实例
@@ -407,6 +519,27 @@ public class PushServer {
 		
 	}
 
+//推送某个特定用户消息
+/*
+**输入：**
+
+DeployStatus status ：枚举类型,指定推送开发模式状态，不同状态需要终端采用不同的开发者证书
+> 开发状态：DeployStatus.Developer
+> 
+> 发布状态：DeployStatus.Production 
+
+String msg ：推送内容，字符串类型
+
+Long ChannelId： 推送通道ID
+
+String UserId：应用的用户ID
+
+String title ：推送标题（可选参数），字符串类型
+
+**输出：**
+
+boolean 布尔类型，推送成功返回true，失败返回false
+*/
 	public boolean iOSPushSingleMsg(DeployStatus status ,Long ChannelId,String UserId,String msg,String...title){
 		ChannelKeyPair pair = new ChannelKeyPair(getApiKey(), getSecretKey());
 		// 2. 创建BaiduChannelClient对象实例
@@ -457,6 +590,8 @@ public class PushServer {
 		
 	}
 
+
+//测试代码
 	public static void main(String[] args){
 		
 		// 1. 设置developer平台的ApiKey/SecretKey
